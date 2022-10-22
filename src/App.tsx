@@ -1,10 +1,11 @@
 import {FC} from 'react';
+import {Converter} from './components';
 import './styles/index.scss';
 
 const App: FC = () => {
     return (
         <div className="app">
-            APP
+            <Converter />
         </div>
     );
 };

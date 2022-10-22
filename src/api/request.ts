@@ -1,11 +1,18 @@
-import axios, {AxiosInstance, AxiosRequestConfig} from 'axios';
+import axios, {
+    AxiosHeaders,
+    AxiosInstance,
+    AxiosRequestConfig,
+    CreateAxiosDefaults,
+    RawAxiosRequestHeaders,
+} from 'axios';
 
 class Requests {
     private request: AxiosInstance;
 
-    constructor(baseURL: string) {
+    constructor(baseURL: string, config?: CreateAxiosDefaults) {
         this.request = axios.create({
             baseURL,
+            ...config,
         });
     }
 
@@ -22,4 +29,15 @@ class Requests {
     }
 }
 
-export const githubRequests = new Requests('https://api.github.com');
+const converterApikey = 'DOuOrLWgZnjZD3ZClWwwlU2atHdWN3kK';
+
+const requestOptions = {
+    method: 'GET',
+    redirect: 'follow',
+    headers: {apikey: converterApikey},
+};
+
+export const exchangeRequests = new Requests(
+    'https://api.apilayer.com/exchangerates_data',
+    requestOptions
+);
