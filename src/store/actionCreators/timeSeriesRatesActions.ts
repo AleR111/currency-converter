@@ -19,14 +19,16 @@ export const fetchTimeSeriesRatesData = createAsyncThunk(
         const local: TimeSeriesConverterData | null = JSON.parse(
             localStorage.getItem(key)
         );
+        console.log("🚀 ~ file: timeSeriesRatesActions.ts ~ line 22 ~ local", local)
 
-        const isIncludeStartDate = startDate >= local.start_date ;
+        const isIncludeStartDate = startDate >= local?.start_date ;
 
-        const isIncludeEndDate = endDate <= local.end_date;
+        const isIncludeEndDate = endDate <= local?.end_date;
+        console.log("🚀 ~ file: timeSeriesRatesActions.ts ~ line 26 ~ isIncludeEndDate", isIncludeEndDate)
       
 
 
-        if (isIncludeStartDate && isIncludeEndDate) return local;
+        if (local && isIncludeStartDate && isIncludeEndDate) return local;
         try {
             const response = await getTimeSeries<TimeSeriesConverterData>(
                 startDate,
