@@ -17,7 +17,17 @@ import {
 import {FC, useCallback, useEffect, useRef} from 'react';
 import {useAppSelector} from '../../../hooks';
 import {TimeSeriesConverterData} from '../../../types';
-import './chart.scss';
+import classes from './chart.module.scss';
+import {DateAxis} from './date-axis';
+import {RateAxis} from './rate-axis';
+import {Tooltip} from './tooltip';
+
+const margin = {top: 40, right: 80, bottom: 80, left: 40};
+
+const heightChart = 500;
+const widthChart = 800;
+const innerWidth = widthChart - margin.left - margin.right;
+const innerHeight = heightChart - margin.top - margin.bottom;
 
 export const Chart = () => {
     const {data} = useAppSelector((state) => state.timeSeriesRates);
@@ -31,37 +41,28 @@ interface ChartContProps {
 }
 
 export const ChartCont: FC<ChartContProps> = ({data}) => {
-    const ref = useRef(null);
-    const refL = useRef(null);
-    const rect = useRef(null);
-
-    const ratesArr = Object.keys(data.rates);
-
     const parseTime = timeParse('%Y-%m-%d');
 
-    const dataArray = Object.keys(data.rates).map((d) => {
+    const convertedData = Object.keys(data.rates).map((d) => {
         return {
             date: parseTime(d) as Date,
             value: data.rates[d].EUR,
         };
     });
-    console.log('🚀 ~ file: Chart.tsx ~ line 15 ~ data ~ data', dataArray);
 
-    const xExtent = extent(dataArray, (d) => d.date) as [Date, Date];
+    const xExtent = extent(convertedData, (d) => d.date) as [Date, Date];
 
-    const xScale = scaleTime().domain(xExtent).range([0, 500]);
+    const xScale = scaleTime().domain(xExtent).range([0, innerWidth]);
 
-    const yMax = max(dataArray, (d) => d.value) as number;
-    const yMin = min(dataArray, (d) => d.value) as number;
+    const yMax = max(convertedData, (d) => d.value) as number;
+    const yMin = min(convertedData, (d) => d.value) as number;
 
-    const yScale = scaleLinear().domain([yMin, yMax]).range([300, 0]);
+    const yScale = scaleLinear().domain([yMin, yMax]).range([innerHeight, 0]);
 
-    const coords = dataArray.map((el) => {
+    const coords = convertedData.map((el) => {
         return {
             x: xScale(el.date),
             y: yScale(el.value),
-            //   vessel: el.vessel,
-            //   color: color(el.vessel),
         };
     });
     const dPath = line<{
@@ -70,68 +71,34 @@ export const ChartCont: FC<ChartContProps> = ({data}) => {
     }>()
         .x((d) => d.x)
         .y((d) => d.y)(coords) as string;
-    console.log('🚀 ~ file: Chart.tsx ~ line 39 ~ Chart ~ dPath', dPath);
-    var axisPad = 6;
-    // const dateFormatter = time.format("%m/%d/%y")
-
-    var xAxis = axisBottom(xScale)
-        .tickSizeOuter(axisPad * 2)
-        .tickSizeInner(axisPad * 2);
-    // var xAxis = axisBottom(xScale).tickFormat(parseTime);
-    // var yAxis = d3.axisLeft(yScale).ticks(10, 's').tickSize(-width); //horizontal ticks across svg width
-
-    useEffect(() => {
-        if (!ref.current && !refL.current) return;
-
-        const xAxisG = select(ref.current);
-        const xAxis1 = axisBottom(xScale);
-        // .tickSizeOuter(axisPad * 2)
-        // .tickSizeInner(axisPad * 2);
-        xAxisG.call(xAxis1);
-
-        const yAxisG = select(refL.current);
-        const yAxis1 = axisLeft(yScale).tickSize(-500);
-        yAxisG.call(yAxis1);
-    }, []);
-    const bisectDate = bisector(function (d: any) {
-        return d.date;
-    }).left;
-    const mousemove = useCallback((e) => {
-        const x0 = xScale.invert(pointer(e)[0]);
-        // const y = yScale.invert(pointer(e)[1]);
-        const i = bisectDate(dataArray, x0, 1);
-
-        const d0 = dataArray[i - 1];
-        const d1 = dataArray[i];
-        const d = +x0.toISOString() - +d0.date.toISOString() > +d1.date.toISOString() - +x0.toISOString() ? d1 : d0;
-        console.log('🚀 ~ file: Chart.tsx ~ line 98 ~ mousemove ~ x', x0, d1, d0);
-    }, []);
 
     return (
         <div>
             <svg
-                height={600}
-                width={600}
+                height={heightChart}
+                width={widthChart}
             >
-                <g transform={`translate(${64}, ${24})`}>
+                <g transform={`translate(${margin.left},${margin.top})`}>
                     <path
-                        fill="none"
+                        className={classes.chartLine}
                         d={dPath}
-                        stroke="yellowgreen"
                     />
-                    <g
-                        ref={ref}
-                        transform={`translate(${0}, ${300})`}
-                    ></g>
-                    <g
-                        ref={refL}
-                        className={'root'}
-                    ></g>
-                    <rect
-                        height={300}
-                        width={500}
-                        ref={rect}
-                        onMouseMove={mousemove}
+
+                    <RateAxis
+                        yScale={yScale}
+                        innerWidth={innerWidth}
+                    />
+
+                    <DateAxis
+                        xScale={xScale}
+                        innerHeight={innerHeight}
+                    />
+                    <Tooltip
+                        xScale={xScale}
+                        yScale={yScale}
+                        convertedData={convertedData}
+                        innerWidth={innerWidth}
+                        innerHeight={innerHeight}
                     />
                 </g>
             </svg>
