@@ -1,7 +1,10 @@
 import {useEffect} from 'react';
 import {getLatest, getTimeSeries} from '../../api';
 import {useAppActions} from '../../hooks';
+import {Chart} from './chart';
 import {CurrencyPicker} from './currency-picker';
+import {LatestCurrency} from './latest-currency';
+import {PeriodPicker} from './period-picker';
 
 export const Converter = () => {
     const {fetchLatestConverterData, fetchTimeSeriesRatesData} =
@@ -25,6 +28,9 @@ export const Converter = () => {
     return (
         <div>
             <CurrencyPicker />
+            <PeriodPicker />
+            <LatestCurrency />
+            <Chart />
         </div>
     );
 };
