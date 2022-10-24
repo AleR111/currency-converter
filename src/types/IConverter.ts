@@ -1,5 +1,5 @@
 type Rates = Record<string, number>;
-type TimeSeriesRates = Record<string, Rates>;
+export type TimeSeriesRates = Record<string, Rates>;
 
 export interface LatestConverterData {
     base: string;

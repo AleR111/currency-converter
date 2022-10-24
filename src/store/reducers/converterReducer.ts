@@ -20,7 +20,11 @@ export const sliceName = 'latestConverter';
 export const latestConverterSlice = createSlice({
     name: sliceName,
     initialState,
-    reducers: {},
+    reducers: {
+        setLatestCurrencyData(state, action: PayloadAction<LatestConverterData>) {
+            state.data = action.payload;
+        },
+    },
     extraReducers: {
         [fetchLatestConverterData.fulfilled.type]: (
             state,

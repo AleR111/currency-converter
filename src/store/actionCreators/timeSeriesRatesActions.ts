@@ -9,26 +9,27 @@ interface Params {
     endDate: string;
     base?: string;
     symbol?: string;
+    setTimeSeriesCurrency: (data: TimeSeriesConverterData | null) => void
 }
 
 export const fetchTimeSeriesRatesData = createAsyncThunk(
     `timeSeriesRates/fetchData`,
     async (params: Params, {rejectWithValue}) => {
-        const {base, symbol, startDate, endDate} = params;
+        const {base, symbol, startDate, endDate, setTimeSeriesCurrency} = params;
         const key = `${base}-${symbol}-series`;
-        const local: TimeSeriesConverterData | null = JSON.parse(
-            localStorage.getItem(key)
-        );
-        console.log("🚀 ~ file: timeSeriesRatesActions.ts ~ line 22 ~ local", local)
+        // const local: TimeSeriesConverterData | null = JSON.parse(
+        //     localStorage.getItem(key)
+        // );
+        // console.log("🚀 ~ file: timeSeriesRatesActions.ts ~ line 22 ~ local", local)
 
-        const isIncludeStartDate = startDate >= local?.start_date ;
+        // const isIncludeStartDate = startDate >= local?.start_date ;
 
-        const isIncludeEndDate = endDate <= local?.end_date;
-        console.log("🚀 ~ file: timeSeriesRatesActions.ts ~ line 26 ~ isIncludeEndDate", isIncludeEndDate)
+        // const isIncludeEndDate = endDate <= local?.end_date;
+        // console.log("🚀 ~ file: timeSeriesRatesActions.ts ~ line 26 ~ isIncludeEndDate", isIncludeEndDate)
       
 
 
-        if (local && isIncludeStartDate && isIncludeEndDate) return local;
+        // if (local && isIncludeStartDate && isIncludeEndDate) return local;
         try {
             const response = await getTimeSeries<TimeSeriesConverterData>(
                 startDate,
@@ -38,7 +39,7 @@ export const fetchTimeSeriesRatesData = createAsyncThunk(
             );
             console.log("🚀 ~ file: timeSeriesRatesActions.ts ~ line 42 ~ response", response)
             const latestData = response.data;
-            localStorage.setItem(key, JSON.stringify(latestData));
+            setTimeSeriesCurrency(latestData);
             return latestData;
         } catch (e) {
             return rejectWithValue(e.response.data.message);

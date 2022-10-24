@@ -1,13 +1,18 @@
-import {useEffect, useState} from 'react';
-import {getLatest, getTimeSeries} from '../../api';
+import {useCallback, useEffect, useState} from 'react';
 import {useAppActions} from '../../hooks';
-import {CurrencyList, SeriesPeriod} from '../../types';
+import {useLocalStorage} from '../../hooks/local-storage/useLocalStorage';
+import {curDateISO, updatingTime} from '../../settings';
+import {
+    CurrencyList,
+    LatestConverterData,
+    SeriesPeriod,
+    TimeSeriesConverterData,
+    TimeSeriesRates,
+} from '../../types';
 import {Chart} from './chart';
 import {CurrencyPicker} from './currency-picker';
 import {LatestCurrency} from './latest-currency';
 import {PeriodPicker} from './period-picker';
-
-const ConverterContainer = () => {};
 
 export const Converter = () => {
     const [base, setBase] = useState<CurrencyList>(
@@ -23,46 +28,74 @@ export const Converter = () => {
     //     label: 'Евро',
     // }
     const [period, setPeriod] = useState<SeriesPeriod | null>(null);
-    console.log(
-        '🚀 ~ file: Converter.tsx ~ line 22 ~ Converter ~ period',
-        period
-    );
+
+    const {
+        fetchLatestConverterData,
+        setLatestCurrencyData,
+        fetchTimeSeriesRatesData,
+        setTimeSeriesCurrencyData,
+    } = useAppActions();
 
     const baseCode = base?.code || 'USD';
     const symbolCode = symbol?.code || 'EUR';
+    const key = `${baseCode}-${symbolCode}`;
+    const seriesKey = `${key}-series`;
 
-    const {fetchLatestConverterData, fetchTimeSeriesRatesData} =
-        useAppActions();
-    useEffect(() => {
-        if (!period) return;
-        const {startDate, endDate} = period;
-        const id = setInterval(
-            () =>
-                fetchLatestConverterData({
-                    base: baseCode,
-                    symbol: symbolCode,
-                }),
-            60000
-        );
+    const [latestCurrency, setLatestCurrency] =
+        useLocalStorage<LatestConverterData | null>(key, null);
+    const [timeSeriesCurrency, setTimeSeriesCurrency] =
+        useLocalStorage<TimeSeriesConverterData | null>(seriesKey, null);
+
+    const latestHandler = useCallback(() => {
+        const isOldData = curDateISO - latestCurrency?.timestamp > updatingTime;
+
+        if (latestCurrency && !isOldData) {
+            return setLatestCurrencyData(latestCurrency);
+        }
+
         fetchLatestConverterData({
             base: baseCode,
             symbol: symbolCode,
-        }),
-            fetchTimeSeriesRatesData({
-                startDate,
-                endDate,
-                base: baseCode,
-                symbol: symbolCode,
-            });
-        console.log(
-            '🚀 ~ file: Converter.tsx ~ line 24 ~ useEffect ~ symbol',
-            'symbol'
-        );
+            setLatestCurrency,
+        });
+    }, [latestCurrency, baseCode, symbolCode]);
 
-        return () => {
-            clearTimeout(id);
-        };
-    }, [period, base, symbol]);
+    const timeSeriesHandler = useCallback(() => {
+        if (!period) return;
+        const {startDate, endDate} = period;
+
+        const isIncludeStartDate = startDate >= timeSeriesCurrency?.start_date;
+        const isIncludeEndDate = endDate <= timeSeriesCurrency?.end_date;
+
+        if (timeSeriesCurrency && isIncludeStartDate && isIncludeEndDate) {
+            const curDataArray = {} as TimeSeriesRates;
+            for (const date in timeSeriesCurrency.rates) {
+                if (startDate <= date && date <= endDate) {
+                    curDataArray[date] = timeSeriesCurrency.rates[date];
+                }
+            }
+            return setTimeSeriesCurrencyData({
+                ...timeSeriesCurrency,
+                rates: curDataArray,
+            });
+        }
+
+        fetchTimeSeriesRatesData({
+            startDate,
+            endDate,
+            base: baseCode,
+            symbol: symbolCode,
+            setTimeSeriesCurrency,
+        });
+    }, [period, timeSeriesCurrency]);
+
+    useEffect(() => {
+        latestHandler();
+        timeSeriesHandler();
+    }, [latestHandler, timeSeriesHandler]);
+
+    console.log('converter 211');
+
     return (
         <div>
             <CurrencyPicker
