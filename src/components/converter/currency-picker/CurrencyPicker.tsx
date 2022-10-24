@@ -1,13 +1,22 @@
 import {Autocomplete} from '../../ui-component';
 import classes from './currencyPicker.module.scss';
 import {currencyList} from '../../../settings';
-import {useState} from 'react';
+import {Dispatch, FC, useState} from 'react';
 import {CurrencyList} from '../../../types';
 
-export const CurrencyPicker = () => {
-    const [base, setBase] = useState<CurrencyList>(null);
-    const [symbol, setSymbol] = useState<CurrencyList>(null);
+interface CurrencyPickerParams {
+    base: CurrencyList | null;
+    setBase: (value: CurrencyList | null) => void;
+    symbol: CurrencyList | null;
+    setSymbol: (value: CurrencyList | null) => void;
+}
 
+export const CurrencyPicker: FC<CurrencyPickerParams> = ({
+    base,
+    setBase,
+    symbol,
+    setSymbol,
+}) => {
     return (
         <div>
             <div className={classes.locationsPickerBox}>

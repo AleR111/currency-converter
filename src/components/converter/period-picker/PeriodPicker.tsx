@@ -1,19 +1,62 @@
-import {useState} from 'react';
+import {FC, memo, useEffect, useState, useLayoutEffect} from 'react';
+import {subDays, subMonths, format} from 'date-fns';
+
+import {
+    PeriodPickerMeta,
+    PeriodPickerValue,
+    SeriesPeriod,
+} from '../../../types';
 import {ToggleButton} from '../../ui-component/toggle-button';
 
-export const PeriodPicker = () => {
-    const [value, setValue] = useState('');
-    console.log("🚀 ~ file: PeriodPicker.tsx ~ line 6 ~ PeriodPicker ~ value", value)
+const activityValue: PeriodPickerMeta[] = [
+    {label: '1 Day', value: 'day'},
+    {label: '1 Week', value: 'week'},
+    {label: '1 Month', value: 'month'},
+    {label: '6 Month', value: 'halfYear'},
+    {label: '1 Year', value: 'year'},
+];
 
-    const activityValue = [
-        {label: 'День', value: 'day'},
-        {label: 'Месяц', value: 'month'},
-        {label: 'Пол года', value: 'halfyear'},
-        {label: 'Год', value: 'year'},
-    ];
-    const onChangeHandler = (newValue: string) => {
-        setValue(newValue);
+const getLateDate = (activityValue: PeriodPickerValue, curDate: Date) => {
+    switch (activityValue) {
+        case 'day':
+            return subDays(curDate, 1);
+        case 'week':
+            return subDays(curDate, 7);
+        case 'month':
+            return subMonths(curDate, 1);
+        case 'halfYear':
+            return subMonths(curDate, 6);
+        case 'year':
+            return subMonths(curDate, 12);
+    }
+};
+
+const getDatePeriod = (activityValue: PeriodPickerValue) => {
+    const nowDate = new Date();
+    const startDate = getLateDate(activityValue, nowDate);
+
+    return {
+        startDate: format(startDate, 'yyyy-MM-dd'),
+        endDate: format(nowDate, 'yyyy-MM-dd'),
     };
+};
+
+interface PeriodPickerProps {
+    setPeriod: (period: SeriesPeriod) => void;
+}
+
+export const PeriodPicker: FC<PeriodPickerProps> = memo(({setPeriod}) => {
+    const [value, setValue] = useState<PeriodPickerValue>('week');
+    console.log('🚀 ~ file: PeriodPicker.tsx ~ line 50 ~ value', value);
+
+    const onChangeHandler = (newValue: PeriodPickerValue) => {
+        setValue(newValue);
+        setPeriod(getDatePeriod(newValue));
+    };
+
+    // useLayoutEffect(() => {
+    //     setPeriod(getDatePeriod(value));
+    // }, []);
     return (
         <div>
             <ToggleButton
@@ -23,4 +66,4 @@ export const PeriodPicker = () => {
             />
         </div>
     );
-};
+});

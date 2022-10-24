@@ -1,11 +1,11 @@
 import {FC} from 'react';
-import {Converter} from './components';
+import {Layout} from './components';
 import './styles/index.scss';
 
 const App: FC = () => {
     return (
         <div className="app">
-            <Converter />
+            <Layout />
         </div>
     );
 };

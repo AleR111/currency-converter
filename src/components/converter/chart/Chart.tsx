@@ -44,9 +44,10 @@ export const ChartCont: FC<ChartContProps> = ({data}) => {
     const parseTime = timeParse('%Y-%m-%d');
 
     const convertedData = Object.keys(data.rates).map((d) => {
+        const code = Object.keys(data.rates[d])[0];
         return {
             date: parseTime(d) as Date,
-            value: data.rates[d].EUR,
+            value: data.rates[d][code],
         };
     });
 
