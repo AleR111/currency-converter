@@ -8,13 +8,13 @@ interface DateAxisProps {
 
 export const DateAxis: FC<DateAxisProps> = ({xScale, innerHeight}) => {
     const ref = useRef<SVGRectElement>(null);
-console.log('axisX');
+    console.log('axisX');
 
     useEffect(() => {
         const xAxisG = select(ref.current);
         const xAxis = axisBottom(xScale).tickPadding(8);
         xAxisG.call(xAxis);
-    }, []);
+    }, [xScale, innerHeight]);
     return (
         <g
             transform={`translate(0,${innerHeight})`}

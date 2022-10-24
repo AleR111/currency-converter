@@ -6,6 +6,10 @@ interface PersistentStorage {
 class LocalStorage implements PersistentStorage {
     getItem(key: string) {
         const item = localStorage.getItem(key);
+        console.log(
+            '🚀 ~ file: localStorage.ts ~ line 9111111111 ~ LocalStorage ~ getItem ~ item',
+            item
+        );
 
         if (item === null) return undefined;
 

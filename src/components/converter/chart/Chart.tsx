@@ -22,7 +22,7 @@ import {DateAxis} from './date-axis';
 import {RateAxis} from './rate-axis';
 import {Tooltip} from './tooltip';
 
-const margin = {top: 40, right: 80, bottom: 80, left: 40};
+const margin = {top: 40, right: 80, bottom: 80, left: 60};
 
 const heightChart = 500;
 const widthChart = 800;

@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useAppActions} from '../../hooks';
+import {persistentStorage} from '../../hooks/local-storage/localStorage';
 import {useLocalStorage} from '../../hooks/local-storage/useLocalStorage';
 import {curDateISO, updatingTime} from '../../settings';
 import {
@@ -15,18 +16,9 @@ import {LatestCurrency} from './latest-currency';
 import {PeriodPicker} from './period-picker';
 
 export const Converter = () => {
-    const [base, setBase] = useState<CurrencyList>(
-        //     {
-        //     code: 'USD',
-        //     label: 'Доллар США',
-        // }
-        null
-    );
-    const [symbol, setSymbol] = useState<CurrencyList>(null);
-    //     {
-    //     code: 'EUR',
-    //     label: 'Евро',
-    // }
+    const [base, setBase] = useState<string>('USD');
+    const [symbol, setSymbol] = useState<string>('RUB');
+
     const [period, setPeriod] = useState<SeriesPeriod | null>(null);
 
     const {
@@ -36,15 +28,11 @@ export const Converter = () => {
         setTimeSeriesCurrencyData,
     } = useAppActions();
 
-    const baseCode = base?.code || 'USD';
-    const symbolCode = symbol?.code || 'EUR';
-    const key = `${baseCode}-${symbolCode}`;
+    const key = `${base}-${symbol}`;
     const seriesKey = `${key}-series`;
 
-    const [latestCurrency, setLatestCurrency] =
-        useLocalStorage<LatestConverterData | null>(key, null);
-    const [timeSeriesCurrency, setTimeSeriesCurrency] =
-        useLocalStorage<TimeSeriesConverterData | null>(seriesKey, null);
+    const latestCurrency = persistentStorage.getItem(key);
+    const timeSeriesCurrency = persistentStorage.getItem(seriesKey);
 
     const latestHandler = useCallback(() => {
         const isOldData = curDateISO - latestCurrency?.timestamp > updatingTime;
@@ -54,11 +42,11 @@ export const Converter = () => {
         }
 
         fetchLatestConverterData({
-            base: baseCode,
-            symbol: symbolCode,
-            setLatestCurrency,
+            base,
+            symbol,
+            key,
         });
-    }, [latestCurrency, baseCode, symbolCode]);
+    }, [latestCurrency, base, symbol]);
 
     const timeSeriesHandler = useCallback(() => {
         if (!period) return;
@@ -83,11 +71,11 @@ export const Converter = () => {
         fetchTimeSeriesRatesData({
             startDate,
             endDate,
-            base: baseCode,
-            symbol: symbolCode,
-            setTimeSeriesCurrency,
+            base,
+            symbol,
+            key: seriesKey,
         });
-    }, [period, timeSeriesCurrency]);
+    }, [period, base, symbol, timeSeriesCurrency]);
 
     useEffect(() => {
         latestHandler();

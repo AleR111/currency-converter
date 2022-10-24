@@ -2,6 +2,7 @@ import {FC, useCallback, useState} from 'react';
 import {pointer, bisector, ScaleTime, ScaleLinear} from 'd3';
 import {ConvertedData, CoordTooltipData} from '../../../../types';
 import classes from './tooltip.module.scss';
+import {format} from 'date-fns';
 
 const bisectDate = bisector(function (d: any) {
     return d.date;
@@ -88,6 +89,14 @@ export const Tooltip: FC<TooltipProps> = ({
                             fill="white"
                             stroke="#000"
                         />
+                        <text stroke="#000"  x={10}
+                            y={24}>
+                            {Math.round(coordTooltipData.value)}
+                        </text>
+                        <text stroke="#000" x={10} y={4}>
+                            {format(coordTooltipData.date, 'yyyy-MMM-dd')}
+                        </text>
+
                         <circle
                             className={classes.circle}
                             r={r}

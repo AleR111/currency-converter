@@ -26,7 +26,6 @@ interface ToggleButtonProps {
     value: string | null;
     onChange: (value: string) => void;
     className?: string;
-    isActive?: boolean;
 }
 
 export const ToggleButton: FC<ToggleButtonProps> = ({
@@ -34,10 +33,9 @@ export const ToggleButton: FC<ToggleButtonProps> = ({
     value,
     onChange,
     className,
-    isActive = false,
 }) => {
     const handleChange = (e: React.MouseEvent, newValue: string) => {
-        if (!isActive || newValue !== null) {
+        if (newValue !== null) {
             onChange(newValue);
         }
     };

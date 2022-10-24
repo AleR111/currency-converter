@@ -1,4 +1,1 @@
-export interface CurrencyList {
-    code: string;
-    label: string;
-}
+export type CurrencyList = Record<string, string>;

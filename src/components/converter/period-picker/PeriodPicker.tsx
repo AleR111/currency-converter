@@ -1,5 +1,5 @@
-import {FC, memo, useEffect, useState, useLayoutEffect} from 'react';
-import {subDays, subMonths, format} from 'date-fns';
+import {FC, memo, useEffect, useState} from 'react';
+import {subDays, subMonths, format, subWeeks} from 'date-fns';
 
 import {
     PeriodPickerMeta,
@@ -21,7 +21,7 @@ const getLateDate = (activityValue: PeriodPickerValue, curDate: Date) => {
         case 'day':
             return subDays(curDate, 1);
         case 'week':
-            return subDays(curDate, 7);
+            return subWeeks(curDate, 1);
         case 'month':
             return subMonths(curDate, 1);
         case 'halfYear':
@@ -47,16 +47,14 @@ interface PeriodPickerProps {
 
 export const PeriodPicker: FC<PeriodPickerProps> = memo(({setPeriod}) => {
     const [value, setValue] = useState<PeriodPickerValue>('week');
-    console.log('🚀 ~ file: PeriodPicker.tsx ~ line 50 ~ value', value);
 
     const onChangeHandler = (newValue: PeriodPickerValue) => {
         setValue(newValue);
-        setPeriod(getDatePeriod(newValue));
     };
 
-    // useLayoutEffect(() => {
-    //     setPeriod(getDatePeriod(value));
-    // }, []);
+    useEffect(() => {
+        setPeriod(getDatePeriod(value));
+    }, [value]);
     return (
         <div>
             <ToggleButton
