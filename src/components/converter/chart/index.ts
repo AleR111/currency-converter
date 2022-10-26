@@ -1,1 +1,1 @@
-export * from './Chart';
+export {ChartContainer as Chart} from './Chart';

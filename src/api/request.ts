@@ -1,9 +1,7 @@
 import axios, {
-    AxiosHeaders,
     AxiosInstance,
     AxiosRequestConfig,
     CreateAxiosDefaults,
-    RawAxiosRequestHeaders,
 } from 'axios';
 
 class Requests {
@@ -29,7 +27,7 @@ class Requests {
     }
 }
 
-const converterApikey = 'Qp7QGgPAkNA7aVcULYlVa3bCcrsNJ88O';
+const converterApikey = 'gTCRUpykJ4OLlXczglGQ4vuHeOoR9fwM';
 
 const requestOptions = {
     method: 'GET',

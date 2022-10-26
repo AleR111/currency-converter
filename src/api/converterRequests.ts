@@ -13,6 +13,7 @@ export const getTimeSeries = <T>(
         base ? `&base=${base}` : '',
         symbol ? `&symbols=${symbol}` : '',
     ].join('');
+
     return exchangeRequests.get<T>(
         `/timeseries?start_date=${startDate}&end_date=${endDate}${optionPoint}`
     );

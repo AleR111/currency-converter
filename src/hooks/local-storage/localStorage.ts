@@ -4,14 +4,10 @@ interface PersistentStorage {
 }
 
 class LocalStorage implements PersistentStorage {
-    getItem(key: string) {
+    getItem<T>(key: string): T {
         const item = localStorage.getItem(key);
-        console.log(
-            '🚀 ~ file: localStorage.ts ~ line 9111111111 ~ LocalStorage ~ getItem ~ item',
-            item
-        );
 
-        if (item === null) return undefined;
+        if (item === null) return null;
 
         if (item === 'null') return null;
         if (item === 'undefined') return undefined;
@@ -19,10 +15,8 @@ class LocalStorage implements PersistentStorage {
         try {
             return JSON.parse(item);
         } catch {}
-
-        return item;
     }
-    setItem(key: string, value: any) {
+    setItem<T>(key: string, value: T) {
         if (value === undefined) {
             localStorage.removeItem(key);
         } else {

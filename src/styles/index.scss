@@ -1,5 +1,5 @@
-@import "reset";
-@import "variables/global";
+@import 'reset';
+@import 'variables/global';
 
 .app {
     font: var(--font-m);
@@ -8,4 +8,11 @@
     color: var(--primary-color);
 
     min-height: 100vh;
+}
+
+.domain {
+    stroke: #bbbbbb;
+}
+.tick line {
+    stroke: #bbbbbb;
 }

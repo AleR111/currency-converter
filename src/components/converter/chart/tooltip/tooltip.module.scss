@@ -4,6 +4,28 @@
     stroke: none;
 }
 
+.tooltip {
+    pointer-events: none;
+}
+
+.tooltipBox {
+    width: 100px;
+    height: 50px;
+    fill: white;
+    stroke: rgba(0, 0, 0, 0.87);
+}
+
+.text {
+    font-size: 14px;
+    font-weight: 600;
+    fill: rgba(0, 0, 0, 0.87);
+}
+
+.textDate {
+    font-size: 14px;
+    fill: #5f6368;
+}
+
 .circle {
     stroke: rgb(52, 168, 83);
     fill: rgb(52, 168, 83);

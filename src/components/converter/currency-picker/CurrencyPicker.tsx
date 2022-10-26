@@ -1,7 +1,7 @@
+import {FC} from 'react';
 import {Autocomplete} from '../../ui-component';
 import classes from './currencyPicker.module.scss';
 import {currencyList} from '../../../settings';
-import {FC} from 'react';
 
 interface CurrencyPickerParams {
     base: string;

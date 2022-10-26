@@ -1,6 +1,6 @@
 import {FC} from 'react';
-import {Converter} from '../converter';
 
+import {Converter} from '../converter';
 import classes from './layout.module.scss';
 
 export const Layout: FC = () => {

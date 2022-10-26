@@ -21,7 +21,10 @@ export const timeSeriesRatesSlice = createSlice({
     name: sliceName,
     initialState,
     reducers: {
-        setTimeSeriesCurrencyData(state, action: PayloadAction<TimeSeriesConverterData>) {
+        setTimeSeriesCurrencyData(
+            state,
+            action: PayloadAction<TimeSeriesConverterData>
+        ) {
             state.data = action.payload;
         },
     },

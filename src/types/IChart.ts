@@ -9,3 +9,8 @@ export interface CoordTooltipData {
     xCoord: number;
     yCoord: number;
 }
+
+export interface Path {
+    x: number;
+    y: number;
+}

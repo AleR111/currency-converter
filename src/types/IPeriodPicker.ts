@@ -1,4 +1,9 @@
-export type PeriodPickerValue = 'day' | 'week' | 'month' | 'halfYear' | 'year';
+export type PeriodPickerValue =
+    | 'week'
+    | 'halfMonth'
+    | 'month'
+    | 'halfYear'
+    | 'year';
 
 export interface PeriodPickerMeta {
     label: string;

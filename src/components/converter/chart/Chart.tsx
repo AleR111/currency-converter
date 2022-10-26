@@ -1,58 +1,37 @@
-import {
-    timeParse,
-    scaleTime,
-    extent,
-    max,
-    scaleLinear,
-    min,
-    line,
-    axisBottom,
-    svg,
-    select,
-    axisLeft,
-    timeYear,
-    pointer,
-    bisector,
-} from 'd3';
-import {FC, useCallback, useEffect, useRef} from 'react';
+import {FC} from 'react';
+import {timeParse, scaleTime, extent, max, scaleLinear, min, line} from 'd3';
+
 import {useAppSelector} from '../../../hooks';
-import {TimeSeriesConverterData} from '../../../types';
+import {
+    heightChart,
+    innerHeight,
+    innerWidth,
+    margin,
+    widthChart,
+} from '../../../settings';
+import {Path, TimeSeriesConverterData} from '../../../types';
+import {Error, Skeleton} from '../../ui-component';
 import classes from './chart.module.scss';
 import {DateAxis} from './date-axis';
 import {RateAxis} from './rate-axis';
 import {Tooltip} from './tooltip';
 
-const margin = {top: 40, right: 80, bottom: 80, left: 60};
-
-const heightChart = 500;
-const widthChart = 800;
-const innerWidth = widthChart - margin.left - margin.right;
-const innerHeight = heightChart - margin.top - margin.bottom;
-
-export const Chart = () => {
-    const {data} = useAppSelector((state) => state.timeSeriesRates);
-    if (!data) return null;
-
-    return <ChartCont data={data} />;
-};
-
 interface ChartContProps {
     data: TimeSeriesConverterData;
 }
 
-export const ChartCont: FC<ChartContProps> = ({data}) => {
+const Chart: FC<ChartContProps> = ({data}) => {
     const parseTime = timeParse('%Y-%m-%d');
 
     const convertedData = Object.keys(data.rates).map((d) => {
         const code = Object.keys(data.rates[d])[0];
         return {
             date: parseTime(d) as Date,
-            value: data.rates[d][code],
+            value: +data.rates[d][code].toFixed(3),
         };
     });
 
     const xExtent = extent(convertedData, (d) => d.date) as [Date, Date];
-
     const xScale = scaleTime().domain(xExtent).range([0, innerWidth]);
 
     const yMax = max(convertedData, (d) => d.value) as number;
@@ -66,10 +45,7 @@ export const ChartCont: FC<ChartContProps> = ({data}) => {
             y: yScale(el.value),
         };
     });
-    const dPath = line<{
-        x: number;
-        y: number;
-    }>()
+    const dPath = line<Path>()
         .x((d) => d.x)
         .y((d) => d.y)(coords) as string;
 
@@ -80,19 +56,17 @@ export const ChartCont: FC<ChartContProps> = ({data}) => {
                 width={widthChart}
             >
                 <g transform={`translate(${margin.left},${margin.top})`}>
-                    <path
-                        className={classes.chartLine}
-                        d={dPath}
-                    />
-
                     <RateAxis
                         yScale={yScale}
                         innerWidth={innerWidth}
                     />
-
                     <DateAxis
                         xScale={xScale}
                         innerHeight={innerHeight}
+                    />
+                    <path
+                        className={classes.chartLine}
+                        d={dPath}
                     />
                     <Tooltip
                         xScale={xScale}
@@ -105,4 +79,25 @@ export const ChartCont: FC<ChartContProps> = ({data}) => {
             </svg>
         </div>
     );
+};
+
+export const ChartContainer = () => {
+    const {data, isLoading, error} = useAppSelector(
+        (state) => state.timeSeriesRates
+    );
+
+    if (isLoading) {
+        return (
+            <Skeleton
+                height={heightChart}
+                width={widthChart}
+            />
+        );
+    }
+
+    if (error) return <Error value={error} />;
+
+    if (!data) return null;
+
+    return <Chart data={data} />;
 };

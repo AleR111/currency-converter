@@ -13,5 +13,6 @@ export const RateAxis: FC<DateAxisProps> = ({yScale, innerWidth}) => {
         const yAxis = axisLeft(yScale).tickSize(-innerWidth).tickPadding(8);
         yAxisG.call(yAxis);
     }, [yScale, innerWidth]);
+
     return <g ref={ref} />;
 };

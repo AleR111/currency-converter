@@ -1,10 +1,10 @@
-import {useCallback, useEffect, useState} from 'react';
+import {FC, useCallback, useEffect, useMemo, useState} from 'react';
+import {getUnixTime} from 'date-fns';
+
 import {useAppActions} from '../../hooks';
-import {persistentStorage} from '../../hooks/local-storage/localStorage';
-import {useLocalStorage} from '../../hooks/local-storage/useLocalStorage';
-import {curDateISO, updatingTime} from '../../settings';
+import {persistentStorage} from '../../hooks';
+import {updateTime, updatingTime} from '../../settings';
 import {
-    CurrencyList,
     LatestConverterData,
     SeriesPeriod,
     TimeSeriesConverterData,
@@ -14,11 +14,13 @@ import {Chart} from './chart';
 import {CurrencyPicker} from './currency-picker';
 import {LatestCurrency} from './latest-currency';
 import {PeriodPicker} from './period-picker';
+import classes from './converter.module.scss';
 
-export const Converter = () => {
+export const Converter: FC = () => {
+    const curDateISO = getUnixTime(new Date());
+
     const [base, setBase] = useState<string>('USD');
     const [symbol, setSymbol] = useState<string>('RUB');
-
     const [period, setPeriod] = useState<SeriesPeriod | null>(null);
 
     const {
@@ -31,13 +33,22 @@ export const Converter = () => {
     const key = `${base}-${symbol}`;
     const seriesKey = `${key}-series`;
 
-    const latestCurrency = persistentStorage.getItem(key);
-    const timeSeriesCurrency = persistentStorage.getItem(seriesKey);
+    const getLocalStorageData = useCallback(() => {
+        const latestCurrency =
+            persistentStorage.getItem<LatestConverterData>(key);
+        const timeSeriesCurrency =
+            persistentStorage.getItem<TimeSeriesConverterData>(seriesKey);
+
+        return {latestCurrency, timeSeriesCurrency};
+    }, [key, seriesKey]);
 
     const latestHandler = useCallback(() => {
-        const isOldData = curDateISO - latestCurrency?.timestamp > updatingTime;
+        const {latestCurrency} = getLocalStorageData();
+        const isOldData = latestCurrency
+            ? curDateISO - latestCurrency?.timestamp > updatingTime
+            : true;
 
-        if (latestCurrency && !isOldData) {
+        if (!isOldData) {
             return setLatestCurrencyData(latestCurrency);
         }
 
@@ -46,10 +57,12 @@ export const Converter = () => {
             symbol,
             key,
         });
-    }, [latestCurrency, base, symbol]);
+    }, [getLocalStorageData, base, symbol]);
 
     const timeSeriesHandler = useCallback(() => {
         if (!period) return;
+        const {timeSeriesCurrency} = getLocalStorageData();
+
         const {startDate, endDate} = period;
 
         const isIncludeStartDate = startDate >= timeSeriesCurrency?.start_date;
@@ -75,25 +88,34 @@ export const Converter = () => {
             symbol,
             key: seriesKey,
         });
-    }, [period, base, symbol, timeSeriesCurrency]);
+    }, [period, base, symbol, getLocalStorageData]);
+
+    useEffect(() => {
+        timeSeriesHandler();
+    }, [timeSeriesHandler]);
 
     useEffect(() => {
         latestHandler();
-        timeSeriesHandler();
-    }, [latestHandler, timeSeriesHandler]);
 
-    console.log('converter 211');
+        const id = setInterval(() => {
+            latestHandler();
+        }, updateTime);
+
+        return () => {
+            clearInterval(id);
+        };
+    }, [latestHandler]);
 
     return (
-        <div>
+        <div className={classes.wrapper}>
             <CurrencyPicker
                 base={base}
                 setBase={setBase}
                 symbol={symbol}
                 setSymbol={setSymbol}
             />
-            <PeriodPicker setPeriod={setPeriod} />
             <LatestCurrency />
+            <PeriodPicker setPeriod={setPeriod} />
             <Chart />
         </div>
     );

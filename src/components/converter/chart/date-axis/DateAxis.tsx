@@ -8,7 +8,6 @@ interface DateAxisProps {
 
 export const DateAxis: FC<DateAxisProps> = ({xScale, innerHeight}) => {
     const ref = useRef<SVGRectElement>(null);
-    console.log('axisX');
 
     useEffect(() => {
         const xAxisG = select(ref.current);

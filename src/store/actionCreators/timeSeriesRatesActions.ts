@@ -1,5 +1,4 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {getUnixTime} from 'date-fns';
 
 import {getTimeSeries} from '../../api';
 import {persistentStorage} from '../../hooks/local-storage/localStorage';
