@@ -1,6 +1,6 @@
 import {FC} from 'react';
-import {Autocomplete} from '../../ui-component';
-import classes from './currencyPicker.module.scss';
+
+import {Autocomplete, Divider} from '../../ui-component';
 import {currencyList} from '../../../settings';
 
 interface CurrencyPickerParams {
@@ -17,29 +17,28 @@ export const CurrencyPicker: FC<CurrencyPickerParams> = ({
     setSymbol,
 }) => {
     const itemList = Object.keys(currencyList);
+
     return (
-        <div>
-            <div className={classes.locationsPickerBox}>
-                <Autocomplete
-                    itemList={itemList}
-                    getOptionLabel={(option: string) => currencyList[option]}
-                    label={base}
-                    value={base}
-                    onChange={(_, newValue: string) => {
-                        setBase(newValue);
-                    }}
-                />
-                <div className={classes.dash}> / </div>
-                <Autocomplete
-                    itemList={itemList}
-                    getOptionLabel={(option: string) => currencyList[option]}
-                    label={symbol}
-                    value={symbol}
-                    onChange={(_, newValue: string) => {
-                        setSymbol(newValue);
-                    }}
-                />
-            </div>
-        </div>
+        <>
+            <Autocomplete
+                itemList={itemList}
+                getOptionLabel={(option: string) => currencyList[option]}
+                label={base}
+                value={base}
+                onChange={(_, newValue: string) => {
+                    setBase(newValue);
+                }}
+            />
+            <Divider />
+            <Autocomplete
+                itemList={itemList}
+                getOptionLabel={(option: string) => currencyList[option]}
+                label={symbol}
+                value={symbol}
+                onChange={(_, newValue: string) => {
+                    setSymbol(newValue);
+                }}
+            />
+        </>
     );
 };

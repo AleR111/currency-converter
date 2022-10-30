@@ -15,6 +15,8 @@ import {CurrencyPicker} from './currency-picker';
 import {LatestCurrency} from './latest-currency';
 import {PeriodPicker} from './period-picker';
 import classes from './converter.module.scss';
+import {CalculateLayout} from './calculate-layout';
+import {CurrencyAmount} from './currency-amount';
 
 export const Converter: FC = () => {
     const curDateISO = getUnixTime(new Date());
@@ -108,12 +110,18 @@ export const Converter: FC = () => {
 
     return (
         <div className={classes.wrapper}>
-            <CurrencyPicker
-                base={base}
-                setBase={setBase}
-                symbol={symbol}
-                setSymbol={setSymbol}
+            <CalculateLayout
+                pickComponent={
+                    <CurrencyPicker
+                        base={base}
+                        setBase={setBase}
+                        symbol={symbol}
+                        setSymbol={setSymbol}
+                    />
+                }
+                amountComponent={<CurrencyAmount />}
             />
+
             <LatestCurrency />
             <PeriodPicker setPeriod={setPeriod} />
             <Chart />

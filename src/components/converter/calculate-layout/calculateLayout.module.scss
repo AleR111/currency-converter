@@ -1,0 +1,9 @@
+.calcBox {
+    width: 396px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    &:first-child {
+        margin-bottom: 8px;
+    }
+}
